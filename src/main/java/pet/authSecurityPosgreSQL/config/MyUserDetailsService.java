@@ -1,36 +1,25 @@
 package pet.authSecurityPosgreSQL.config;
 
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-
-import lombok.extern.slf4j.Slf4j;
 import pet.authSecurityPosgreSQL.model.User;
-import pet.authSecurityPosgreSQL.repository.UserRepository;
+import pet.authSecurityPosgreSQL.service.UserService;
 
 @Service
-@Slf4j
 public class MyUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private UserRepository userRepository;
+    UserService userService;
 
-
-    
-	@Override
-	public UserDetails loadUserByUsername(String username) {
-    User user = userRepository.findByUsername(username);
-    if (user == null) {
-    	log.info("User with username - {} not found", username);
-        throw new UsernameNotFoundException(username);
+    @SneakyThrows
+    @Override
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        User user = userService.findByUsername(s);
+        MyUserDetails myUserDetails = new MyUserDetails(user);
+        return myUserDetails;
     }
-    
-    log.info("user loaded: {} roles: {}", user.toString(),user.getRoles());
-    
-    
-    return new MyUserPrincipal(user);
-	}
 }

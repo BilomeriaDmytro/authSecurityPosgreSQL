@@ -11,6 +11,7 @@ import pet.authSecurityPosgreSQL.model.User;
 import pet.authSecurityPosgreSQL.repository.RoleRepository;
 import pet.authSecurityPosgreSQL.repository.UserRepository;
 import pet.authSecurityPosgreSQL.service.UserService;
+import pet.authSecurityPosgreSQL.service.exceptionHandler.exception.RegistrationFailureException;
 import pet.authSecurityPosgreSQL.service.exceptionHandler.exception.UserNotFoundException;
 
 
@@ -49,7 +50,12 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public String saveUser(UserDTO userDTO) {
+    public String saveUser(UserDTO userDTO)
+            throws RegistrationFailureException {
+
+        if(userRepository.findByUsername(userDTO.getUsername()) != null){
+            throw new RegistrationFailureException("Username already taken");
+        }
 
         User user = new User();
         user.setUsername(userDTO.getUsername());
@@ -66,8 +72,8 @@ public class UserServiceImp implements UserService {
         roles.add(roleRepository.findByName("ROLE_USER"));
         user.setRoles(roles);
 
-        log.info("User with username - {} successfully registered. Account status - {}", user.getUsername(), user.getStatus());
         userRepository.save(user);
+        log.info("User with username - {} successfully registered. Account status - {}", user.getUsername(), user.getStatus());
         return user.getUsername();
     }
 

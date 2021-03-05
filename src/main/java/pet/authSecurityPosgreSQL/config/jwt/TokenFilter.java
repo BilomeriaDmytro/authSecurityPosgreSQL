@@ -24,6 +24,7 @@ public class TokenFilter extends GenericFilterBean {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
+        log.info("Validating request...");
         String token = tokenProvider.resolveToken((HttpServletRequest) request);
         if (token != null && tokenProvider.validateToken(token)) {
             Authentication auth = tokenProvider.getAuthentication(token);
@@ -32,6 +33,7 @@ public class TokenFilter extends GenericFilterBean {
                 log.info("Token authenticated");
             }
         }
+        log.info("Validation completed.");
         chain.doFilter(request, response);
     }
 }
